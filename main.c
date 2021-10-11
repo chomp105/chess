@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
 void print_board(char board[8][8][2]);
 void move(char board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int player);
 int checkmate(char board[8][8][2], int king[2][2], int player);
@@ -16,7 +17,7 @@ int check_pawn(char board[8][8][2], int sy, int ex, int ey, int xdist, int ydist
 
 /*
  *
- * TODO: Test and refactor code, make UI, send to beta testers
+ * TODO: Document code, Test and refactor code, make UI, send to beta testers
  *
  */
 
@@ -33,14 +34,16 @@ int main(void) {
             {"wr","wn","wb","wq","wk","wb","wn","wr"}
     };
     int king[2][2] = {
-            {1, 1},
-            {7, 7}
+            {0, 4},
+            {7, 4}
     };
-    int player = 1;
+    int player = 0;
     // game loop
     while(1) {
         print_board(board);
-        move(board, 0, 6, 0, 7, king, player);
+        move(board, 2, 0, 0, 2, king, player);
+        print_board(board);
+        move(board, 4, 3, 4, 7, king, player);
         print_board(board);
         break;
     }
@@ -50,13 +53,57 @@ int main(void) {
 void print_board(char board[8][8][2]) {
     // loops through board and prints pieces to screen along with spaces
     for (int i = 0; i < 8; i++) {
-        printf("+----+----+----+----+----+----+----+----+\n");
+        printf("+---+---+---+---+---+---+---+---+\n");
         for (int j = 0; j < 8; j++) {
-            printf("| %c%c ", board[i][j][0], board[i][j][1]);
+            if (board[i][j][0] == 'w') {
+                switch (board[i][j][1]) {
+                    case 'r':
+                        printf("| \u265c ");
+                        break;
+                    case 'n':
+                        printf("| \u265e ");
+                        break;
+                    case 'b':
+                        printf("| \u265d ");
+                        break;
+                    case 'q':
+                        printf("| \u265b ");
+                        break;
+                    case 'k':
+                        printf("| \u265b ");
+                        break;
+                    case 'p':
+                        printf("| \u265f ");
+                        break;
+                }
+            } else if (board[i][j][0] == 'b') {
+                switch (board[i][j][1]) {
+                    case 'r':
+                        printf("| \u2656 ");
+                        break;
+                    case 'n':
+                        printf("| \u2658 ");
+                        break;
+                    case 'b':
+                        printf("| \u2657 ");
+                        break;
+                    case 'q':
+                        printf("| \u2655 ");
+                        break;
+                    case 'k':
+                        printf("| \u2654 ");
+                        break;
+                    case 'p':
+                        printf("| \u2659 ");
+                        break;
+                }
+            } else {
+                printf("|   ");
+            }
         }
         printf("|\n");
     }
-    printf("+----+----+----+----+----+----+----+----+\n");
+    printf("+---+---+---+---+---+---+---+---+\n");
 }
 
 void move(char board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int player) {
@@ -79,8 +126,8 @@ int checkmate(char board[8][8][2], int king[2][2], int player) {
             if (board[j][i][0] != ' ' && board[j][i][0] != board[king[player][1]][king[player][0]][0]) {
                 for (int k = 0; k < 8; k++) {
                     for (int l = 0; l < 8; l++) {
+                        // if there is a move which is safe, it returns false
                         if (!(check(board, i, j, k, l, king[!player]))) {
-                            transfer_piece(board, i, j, k, l, king[!player]);
                             return 0;
                         }
                     }
@@ -166,13 +213,13 @@ int check_rook(char board[8][8][2], int sx, int sy, int ex, int ey, int xdist, i
         // loops through all the spaces the piece is going through and makes sure nothing is in its path
         // see bishop comments for explanation of logic
         if (abs(xdist) > 0) {
-            for (int i = 1; i < abs(xdist) - 1; i++) {
+            for (int i = 1; i < abs(xdist); i++) {
                 if (board[sy][sx + (i * xdist / abs(xdist))][0] != ' ') {
                     return 0;
                 }
             }
         } else {
-            for (int i = 1; i < abs(ydist) - 1; i++) {
+            for (int i = 1; i < abs(ydist); i++) {
                 if (board[sy + (i * ydist / abs(ydist))][sx][0] != ' ') {
                     return 0;
                 }
@@ -198,7 +245,7 @@ int check_bishop(char board[8][8][2], int sx, int sy, int xdist, int ydist) {
         // checks if there is something in the way of the bishop
         // it loops through, and it multiplies "i" and dist and divides it by abs(dist). this means that there only has to be one for loop
         // if the bishop moves in a negative x direction then "i" will become a negative due to the equation
-        for (int i = 1; i < abs(xdist) - 1; i++) {
+        for (int i = 1; i < abs(xdist); i++) {
             if (board[sy + (i * ydist / abs(ydist))][sx + (i * xdist / abs(xdist))][0] != ' ') {
                 return 0;
             }
