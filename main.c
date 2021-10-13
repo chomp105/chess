@@ -25,7 +25,7 @@ int main(void) {
     // game board with pieces and blank spaces
     char board[8][8][2] = {
             {"br","bn","bb","bq","bk","bb","bn","bb"},
-            {"bp","bp","bp","bp","bp","bp","bp","bp"},
+            {"  ","bp","bp","bp","bp","bp","bp","bp"},
             {"  ","  ","  ","  ","  ","  ","  ","  "},
             {"  ","  ","  ","  ","  ","  ","  ","  "},
             {"  ","  ","  ","  ","  ","  ","  ","  "},
@@ -39,13 +39,12 @@ int main(void) {
     };
     int player = 0;
     // game loop
+    int sx, sy, ex, ey;
     while(1) {
         print_board(board);
-        move(board, 2, 0, 0, 2, king, player);
-        print_board(board);
-        move(board, 4, 3, 4, 7, king, player);
-        print_board(board);
-        break;
+        scanf("%d%d%d%d", &sx, &sy, &ex, &ey);
+        move(board, sx, sy, ex, ey, king, player);
+        system("clear");0
     }
     return 0;
 }
@@ -277,6 +276,7 @@ int check_king(int ex, int ey, int xdist, int ydist, int king[2]) {
 
 int check_pawn(char board[8][8][2], int sy, int ex, int ey, int xdist, int ydist) {
     // checks if pawn is moving forward once, twice for first move, or attacking
+    // TODO: fix pawn function (it is just really bad) (idk what i was thinking)
     if (((xdist == 0 && (abs(ydist == 1) || (abs(ydist == 2)) && (sy == 1 || sy == 6)))
          || ((xdist == 1 && ydist == 1) && board[ey][ex][0] != ' '))) {
         return 1;
