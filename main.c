@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void print_board(char board[8][8][2]);
 void move(char board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int player);
 int checkmate(char board[8][8][2], int king[2][2], int player);
 int check(char board[8][8][2], int sx, int sy, int ex, int ey, int king[2]);
@@ -15,17 +14,11 @@ int check_queen(char board[8][8][2], int sx, int sy, int ex, int ey, int xdist, 
 int check_king(int ex, int ey, int xdist, int ydist, int king[2]);
 int check_pawn(char board[8][8][2], int sy, int ex, int ey, int xdist, int ydist);
 
-/*
- *
- * TODO: Document code, Test and refactor code, make UI, send to beta testers
- *
- */
-
 int main(void) {
     // game board with pieces and blank spaces
     char board[8][8][2] = {
-            {"br","bn","bb","bq","bk","bb","bn","bb"},
-            {"  ","bp","bp","bp","bp","bp","bp","bp"},
+            {"br","bn","bb","bq","bk","bb","bn","br"},
+            {"bp","bp","bp","bp","bp","bp","bp","bp"},
             {"  ","  ","  ","  ","  ","  ","  ","  "},
             {"  ","  ","  ","  ","  ","  ","  ","  "},
             {"  ","  ","  ","  ","  ","  ","  ","  "},
@@ -37,72 +30,8 @@ int main(void) {
             {0, 4},
             {7, 4}
     };
-    int player = 0;
-    // game loop
-    int sx, sy, ex, ey;
-    while(1) {
-        print_board(board);
-        scanf("%d%d%d%d", &sx, &sy, &ex, &ey);
-        move(board, sx, sy, ex, ey, king, player);
-        system("clear");0
-    }
+    int player = 1;
     return 0;
-}
-
-void print_board(char board[8][8][2]) {
-    // loops through board and prints pieces to screen along with spaces
-    for (int i = 0; i < 8; i++) {
-        printf("+---+---+---+---+---+---+---+---+\n");
-        for (int j = 0; j < 8; j++) {
-            if (board[i][j][0] == 'w') {
-                switch (board[i][j][1]) {
-                    case 'r':
-                        printf("| \u265c ");
-                        break;
-                    case 'n':
-                        printf("| \u265e ");
-                        break;
-                    case 'b':
-                        printf("| \u265d ");
-                        break;
-                    case 'q':
-                        printf("| \u265b ");
-                        break;
-                    case 'k':
-                        printf("| \u265b ");
-                        break;
-                    case 'p':
-                        printf("| \u265f ");
-                        break;
-                }
-            } else if (board[i][j][0] == 'b') {
-                switch (board[i][j][1]) {
-                    case 'r':
-                        printf("| \u2656 ");
-                        break;
-                    case 'n':
-                        printf("| \u2658 ");
-                        break;
-                    case 'b':
-                        printf("| \u2657 ");
-                        break;
-                    case 'q':
-                        printf("| \u2655 ");
-                        break;
-                    case 'k':
-                        printf("| \u2654 ");
-                        break;
-                    case 'p':
-                        printf("| \u2659 ");
-                        break;
-                }
-            } else {
-                printf("|   ");
-            }
-        }
-        printf("|\n");
-    }
-    printf("+---+---+---+---+---+---+---+---+\n");
 }
 
 void move(char board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int player) {
