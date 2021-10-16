@@ -38,19 +38,18 @@ int main(void) { //TODO: implement advanced moves (castling, en passant, queenin
     int game = 1;
     // game loop
     while(game) {
+    	system("clear");
         print_board(board, pieces);
-        printf("player %d: ", player);
+        printf("player %d: ", player + 1);
+        // input for the movement
         int sx, sy, ex, ey;
         scanf("%d%d%d%d", &sx, &sy, &ex, &ey);
         sx--;sy--;ex--;ey--;
         if (board[sy][sx][0] != player) {
             continue;
-        } else {
-            if (move(board, sx, sy, ex, ey, king, player, &game)) {
-                player = !player;
-            }
+        } else if (move(board, sx, sy, ex, ey, king, player, &game)) {
+            player = !player;
         }
-        system("clear");
     }
     return 0;
 }
@@ -75,18 +74,22 @@ int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int
     if (eval(board, sx, sy, ex, ey, king[player])) {
         // "checks" for check... get it? check and check... lol
         if (!check(board, sx, sy, ex, ey, king[player])) {
+            if (sx == king[player][1] && sy == king[player][0]) {
+                king[player][0] = ey;
+                king[player][1] = ex;
+            }
             transfer_piece(board, sx, sy, ex, ey);
         } else {
             return 0;
         }
+        // checks for checkmate and stops game if it returns true
         if (checkmate(board, king, player)) {
-            printf("Checkmate");
+            printf("Checkmate\n");
             *game = 0;
         }
         return 1;
-    } else {
-        return 0;
     }
+    return 0;
 }
 
 int checkmate(int board[8][8][2], int king[2][2], int player) {
@@ -99,7 +102,7 @@ int checkmate(int board[8][8][2], int king[2][2], int player) {
                     for (int l = 0; l < 8; l++) {
                         // if there is a move which is safe, it returns false
                         if (!(check(board, i, j, k, l, king[!player]))) {
-                            return 0;
+			                return 0;
                         }
                     }
                 }
@@ -124,10 +127,9 @@ int check(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]) {
         int kingx = king[1];
         int kingy = king[0];
         // loops through every spot on the board and checks to see if it can attack the king
-        //printf("## %d %c ##", eval(nboard, 0, 6, 0, 2, king), nboard[6][0][1]);
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (nboard[j][i][0] != ' ' && nboard[j][i][0] != nboard[kingy][kingx][0]) {
+                if (nboard[j][i][0] != -1 && nboard[j][i][0] != nboard[kingy][kingx][0]) {
                     if (eval(nboard, i, j, kingx, kingy, king)) {
                         return 1;
                     }
@@ -237,8 +239,6 @@ int check_queen(int board[8][8][2], int sx, int sy, int ex, int ey, int xdist, i
 int check_king(int ex, int ey, int xdist, int ydist, int king[2]) {
     // checks that king is only moving one space away
     if (abs(xdist) < 2 && abs(ydist) < 2) {
-        king[0] = ey;
-        king[1] = ex;
         return 1;
     }
     return 0;
@@ -248,7 +248,7 @@ int check_pawn(int board[8][8][2], int sx, int sy, int ex, int ey, int xdist, in
     // checks if pawn is moving forward once, twice for first move, or attacking
     // !(ydist + abs(ydist)) == !board[sy][sx][0] tests to see if the pawn is moving in the right direction.
     // ydist + abs(ydist) makes sure that the number is either 0 or positive
-    if ((((xdist == 0 && abs(ydist) == 1) || (abs(ydist) == 2 && (sy == 1 || sy == 6))) ||
+    if ((((xdist == 0 && abs(ydist) == 1) || (xdist == 0 && abs(ydist) == 2 && (sy == 1 || sy == 6)) && board[ey][ex][0] == -1) ||
          ((xdist == 1 && ydist == 1) && board[ey][ex][0] != -1)) && !(ydist + abs(ydist)) == !board[sy][sx][0]) {
         return 1;
     }
