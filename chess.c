@@ -102,7 +102,7 @@ int checkmate(int board[8][8][2], int king[2][2], int player) {
                     for (int l = 0; l < 8; l++) {
                         // if there is a move which is safe, it returns false
                         if (!(check(board, i, j, k, l, king[!player]))) {
-			                return 0;
+			     return 0;
                         }
                     }
                 }
