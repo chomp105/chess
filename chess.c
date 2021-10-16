@@ -2,25 +2,19 @@
 #include <stdlib.h>
 
 void print_board(int board[8][8][2], char pieces[2][16][4]);
-void move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int player, int *game);
+int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int player, int *game);
 int checkmate(int board[8][8][2], int king[2][2], int player);
 int check(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]);
-void transfer_piece(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]);
+void transfer_piece(int board[8][8][2], int sx, int sy, int ex, int ey);
 int eval(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]);
 int check_rook(int board[8][8][2], int sx, int sy, int ex, int ey, int xdist, int ydist);
 int check_knight(int xdist, int ydist);
 int check_bishop(int board[8][8][2], int sx, int sy, int xdist, int ydist);
 int check_queen(int board[8][8][2], int sx, int sy, int ex, int ey, int xdist, int ydist);
 int check_king(int ex, int ey, int xdist, int ydist, int king[2]);
-int check_pawn(int board[8][8][2], int sy, int ex, int ey, int xdist, int ydist);
+int check_pawn(int board[8][8][2], int sx, int sy, int ex, int ey, int xdist, int ydist);
 
-/*
- *
- * TODO: Document code, Test and refactor code, make UI, send to beta testers
- *
- */
-
-int main(void) {
+int main(void) { //TODO: implement advanced moves (castling, en passant, queening)
     // game board with pieces and blank spaces
     int board[8][8][2] = {
             {{1,0},{1,1},{1,2},{1,3},{1,4},{1,2},{1,1},{1,0}},
@@ -29,12 +23,12 @@ int main(void) {
             {{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1}},
             {{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1}},
             {{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1}},
-            {{0,5},{0,5},{0,5},{0,5},{0,5},{0,5},{0,5},{0,5}},
+            {{0,5},{0,5},{0,5},{0,5},{-1,-1},{0,5},{0,5},{0,5}},
             {{0,0},{0,1},{0,2},{0,3},{0,4},{0,2},{0,1},{0,0}}
     };
     int king[2][2] = {
-            {0, 4},
-            {7, 4}
+            {7, 4},
+            {0, 4}
     };
     char pieces[2][16][4] = {
             {"\u265c", "\u265e", "\u265d", "\u265b", "\u265a", "\u265f"},
@@ -44,16 +38,19 @@ int main(void) {
     int game = 1;
     // game loop
     while(game) {
-        system("clear");
         print_board(board, pieces);
+        printf("player %d: ", player);
         int sx, sy, ex, ey;
         scanf("%d%d%d%d", &sx, &sy, &ex, &ey);
+        sx--;sy--;ex--;ey--;
         if (board[sy][sx][0] != player) {
             continue;
         } else {
-            move(board, sx, sy, ex, ey, king, player, &game);
-            player = !player;
+            if (move(board, sx, sy, ex, ey, king, player, &game)) {
+                player = !player;
+            }
         }
+        system("clear");
     }
     return 0;
 }
@@ -74,18 +71,21 @@ void print_board(int board[8][8][2], char pieces[2][16][4]) {
     printf("+---+---+---+---+---+---+---+---+\n");
 }
 
-void move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int player, int *game) {
+int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int player, int *game) {
     if (eval(board, sx, sy, ex, ey, king[player])) {
         // "checks" for check... get it? check and check... lol
         if (!check(board, sx, sy, ex, ey, king[player])) {
-            transfer_piece(board, sx, sy, ex, ey, king[player]);
+            transfer_piece(board, sx, sy, ex, ey);
         } else {
-            printf("hey! you are in check");
+            return 0;
         }
         if (checkmate(board, king, player)) {
             printf("Checkmate");
             *game = 0;
         }
+        return 1;
+    } else {
+        return 0;
     }
 }
 
@@ -94,7 +94,7 @@ int checkmate(int board[8][8][2], int king[2][2], int player) {
     // it checks if it can move somewhere that will prevent check for the enemy king
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
-            if (board[j][i][0] != ' ' && board[j][i][0] != board[king[player][1]][king[player][0]][0]) {
+            if (board[j][i][0] != -1 && board[j][i][0] != board[king[player][0]][king[player][1]][0]) {
                 for (int k = 0; k < 8; k++) {
                     for (int l = 0; l < 8; l++) {
                         // if there is a move which is safe, it returns false
@@ -120,7 +120,7 @@ int check(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]) {
     }
     if (eval(board, sx, sy, ex, ey, king) && !((sx == ex) && (sy == ey)) && board[ey][ex][0] != board[sy][sx][0]) {
         // moves piece on the new board and sets kingx and kingy to their correct positions
-        transfer_piece(nboard, sx, sy, ex, ey, king);
+        transfer_piece(nboard, sx, sy, ex, ey);
         int kingx = king[1];
         int kingy = king[0];
         // loops through every spot on the board and checks to see if it can attack the king
@@ -139,17 +139,15 @@ int check(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]) {
     return 1;
 }
 
-void transfer_piece(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]) {
+void transfer_piece(int board[8][8][2], int sx, int sy, int ex, int ey) {
     // checks that a move has occurred and that the end point is not a team member
     if (!((sx == ex) && (sy == ey)) && board[ey][ex][0] != board[sy][sx][0]) {
-        if (eval(board, sx, sy, ex, ey, king)) {
-            // moves piece info to specified area
-            board[ey][ex][0] = board[sy][sx][0];
-            board[ey][ex][1] = board[sy][sx][1];
-            // clears out previous position
-            board[sy][sx][0] = -1;
-            board[sy][sx][1] = -1;
-        }
+        // moves piece info to specified area
+        board[ey][ex][0] = board[sy][sx][0];
+        board[ey][ex][1] = board[sy][sx][1];
+        // clears out previous position
+        board[sy][sx][0] = -1;
+        board[sy][sx][1] = -1;
     }
 }
 
@@ -172,7 +170,7 @@ int eval(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]) {
         case 4:
             return check_king(ex, ey, xdist, ydist, king);
         case 5:
-            return check_pawn(board, sy, ex, ey, xdist, ydist);
+            return check_pawn(board, sx, sy, ex, ey, xdist, ydist);
         default:
             return 0;
     }
@@ -185,13 +183,13 @@ int check_rook(int board[8][8][2], int sx, int sy, int ex, int ey, int xdist, in
         // see bishop comments for explanation of logic
         if (abs(xdist) > 0) {
             for (int i = 1; i < abs(xdist); i++) {
-                if (board[sy][sx + (i * xdist / abs(xdist))][0] != ' ') {
+                if (board[sy][sx + (i * xdist / abs(xdist))][0] != -1) {
                     return 0;
                 }
             }
         } else {
             for (int i = 1; i < abs(ydist); i++) {
-                if (board[sy + (i * ydist / abs(ydist))][sx][0] != ' ') {
+                if (board[sy + (i * ydist / abs(ydist))][sx][0] != -1) {
                     return 0;
                 }
             }
@@ -217,7 +215,7 @@ int check_bishop(int board[8][8][2], int sx, int sy, int xdist, int ydist) {
         // it loops through, and it multiplies "i" and dist and divides it by abs(dist). this means that there only has to be one for loop
         // if the bishop moves in a negative x direction then "i" will become a negative due to the equation
         for (int i = 1; i < abs(xdist); i++) {
-            if (board[sy + (i * ydist / abs(ydist))][sx + (i * xdist / abs(xdist))][0] != ' ') {
+            if (board[sy + (i * ydist / abs(ydist))][sx + (i * xdist / abs(xdist))][0] != -1) {
                 return 0;
             }
         }
@@ -246,10 +244,12 @@ int check_king(int ex, int ey, int xdist, int ydist, int king[2]) {
     return 0;
 }
 
-int check_pawn(int board[8][8][2], int sy, int ex, int ey, int xdist, int ydist) {
+int check_pawn(int board[8][8][2], int sx, int sy, int ex, int ey, int xdist, int ydist) {
     // checks if pawn is moving forward once, twice for first move, or attacking
-    // TODO: fix pawn function (it is just really bad) (idk what i was thinking)
-    if (((xdist == 0 && (abs(ydist == 1) || (abs(ydist == 2)) && (sy == 1 || sy == 6))) || ((xdist == 1 && ydist == 1) && board[ey][ex][0] != ' '))) {
+    // !(ydist + abs(ydist)) == !board[sy][sx][0] tests to see if the pawn is moving in the right direction.
+    // ydist + abs(ydist) makes sure that the number is either 0 or positive
+    if ((((xdist == 0 && abs(ydist) == 1) || (abs(ydist) == 2 && (sy == 1 || sy == 6))) ||
+         ((xdist == 1 && ydist == 1) && board[ey][ex][0] != -1)) && !(ydist + abs(ydist)) == !board[sy][sx][0]) {
         return 1;
     }
     return 0;
