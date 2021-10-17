@@ -253,7 +253,7 @@ int check_pawn(int board[8][8][2], int sx, int sy, int ex, int ey, int xdist, in
     // !(ydist + abs(ydist)) == !board[sy][sx][0] tests to see if the pawn is moving in the right direction.
     // ydist + abs(ydist) makes sure that the number is either 0 or positive
     if (((((xdist == 0 && abs(ydist) == 1) || (xdist == 0 && abs(ydist) == 2 && (sy == 1 || sy == 6))) && board[ey][ex][0] == -1) ||
-         ((xdist == 1 && ydist == 1) && board[ey][ex][0] != -1)) && !(ydist + abs(ydist)) == !board[sy][sx][0]) {
+         ((abs(xdist) == 1 && abs(ydist) == 1) && board[ey][ex][0] != -1)) && !(ydist + abs(ydist)) == !board[sy][sx][0]) {
         return 1;
     }
     return 0;
