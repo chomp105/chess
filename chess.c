@@ -73,7 +73,6 @@ void print_board(int board[8][8][2], char pieces[2][16][4]) {
 int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int player, int *game) {
     if (eval(board, sx, sy, ex, ey, king[player])) {
         // "checks" for check... get it? check and check... lol
-	printf("success");
         if (!check(board, sx, sy, ex, ey, king[player])) {
             transfer_piece(board, sx, sy, ex, ey);
 	    if (sx == king[player][1] && sy == king[player][0]) {
