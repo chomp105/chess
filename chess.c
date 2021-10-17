@@ -73,12 +73,13 @@ void print_board(int board[8][8][2], char pieces[2][16][4]) {
 int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int player, int *game) {
     if (eval(board, sx, sy, ex, ey, king[player])) {
         // "checks" for check... get it? check and check... lol
+	printf("success");
         if (!check(board, sx, sy, ex, ey, king[player])) {
-            if (sx == king[player][1] && sy == king[player][0]) {
+            transfer_piece(board, sx, sy, ex, ey);
+	    if (sx == king[player][1] && sy == king[player][0]) {
                 king[player][0] = ey;
                 king[player][1] = ex;
             }
-            transfer_piece(board, sx, sy, ex, ey);
         } else {
             return 0;
         }
@@ -124,6 +125,10 @@ int check(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]) {
     if (eval(board, sx, sy, ex, ey, king) && !((sx == ex) && (sy == ey)) && board[ey][ex][0] != board[sy][sx][0]) {
         // moves piece on the new board and sets kingx and kingy to their correct positions
         transfer_piece(nboard, sx, sy, ex, ey);
+	if (sx == king[1] && sy == king[0]) {
+            king[0] = ey;
+       	    king[1] = ex;
+        }
         int kingx = king[1];
         int kingy = king[0];
         // loops through every spot on the board and checks to see if it can attack the king
@@ -248,7 +253,7 @@ int check_pawn(int board[8][8][2], int sx, int sy, int ex, int ey, int xdist, in
     // checks if pawn is moving forward once, twice for first move, or attacking
     // !(ydist + abs(ydist)) == !board[sy][sx][0] tests to see if the pawn is moving in the right direction.
     // ydist + abs(ydist) makes sure that the number is either 0 or positive
-    if ((((xdist == 0 && abs(ydist) == 1) || (xdist == 0 && abs(ydist) == 2 && (sy == 1 || sy == 6)) && board[ey][ex][0] == -1) ||
+    if (((((xdist == 0 && abs(ydist) == 1) || (xdist == 0 && abs(ydist) == 2 && (sy == 1 || sy == 6))) && board[ey][ex][0] == -1) ||
          ((xdist == 1 && ydist == 1) && board[ey][ex][0] != -1)) && !(ydist + abs(ydist)) == !board[sy][sx][0]) {
         return 1;
     }
