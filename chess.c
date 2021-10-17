@@ -6,12 +6,12 @@ int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int
 int checkmate(int board[8][8][2], int king[2][2], int player);
 int check(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]);
 void transfer_piece(int board[8][8][2], int sx, int sy, int ex, int ey);
-int eval(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]);
+int eval(int board[8][8][2], int sx, int sy, int ex, int ey);
 int check_rook(int board[8][8][2], int sx, int sy, int ex, int ey, int xdist, int ydist);
 int check_knight(int xdist, int ydist);
 int check_bishop(int board[8][8][2], int sx, int sy, int xdist, int ydist);
 int check_queen(int board[8][8][2], int sx, int sy, int ex, int ey, int xdist, int ydist);
-int check_king(int ex, int ey, int xdist, int ydist, int king[2]);
+int check_king(int xdist, int ydist);
 int check_pawn(int board[8][8][2], int sx, int sy, int ex, int ey, int xdist, int ydist);
 
 int main(void) { //TODO: implement advanced moves (castling, en passant, queening)
@@ -71,7 +71,7 @@ void print_board(int board[8][8][2], char pieces[2][16][4]) {
 }
 
 int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int player, int *game) {
-    if (eval(board, sx, sy, ex, ey, king[player])) {
+    if (eval(board, sx, sy, ex, ey)) {
         // "checks" for check... get it? check and check... lol
         if (!check(board, sx, sy, ex, ey, king[player])) {
             transfer_piece(board, sx, sy, ex, ey);
@@ -121,7 +121,7 @@ int check(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]) {
             nboard[i][j][1] = board[i][j][1];
         }
     }
-    if (eval(board, sx, sy, ex, ey, king) && !((sx == ex) && (sy == ey)) && board[ey][ex][0] != board[sy][sx][0]) {
+    if (eval(board, sx, sy, ex, ey) && !((sx == ex) && (sy == ey)) && board[ey][ex][0] != board[sy][sx][0]) {
         // moves piece on the new board and sets kingx and kingy to their correct positions
         transfer_piece(nboard, sx, sy, ex, ey);
 	if (sx == king[1] && sy == king[0]) {
@@ -134,7 +134,7 @@ int check(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (nboard[j][i][0] != -1 && nboard[j][i][0] != nboard[kingy][kingx][0]) {
-                    if (eval(nboard, i, j, kingx, kingy, king)) {
+                    if (eval(nboard, i, j, kingx, kingy)) {
                         return 1;
                     }
                 }
@@ -157,7 +157,7 @@ void transfer_piece(int board[8][8][2], int sx, int sy, int ex, int ey) {
     }
 }
 
-int eval(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]) {
+int eval(int board[8][8][2], int sx, int sy, int ex, int ey) {
     // finds piece type and team from starting position
     int p_type = board[sy][sx][1];
     // x and y distance are the end point minus the start point
@@ -174,7 +174,7 @@ int eval(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]) {
         case 3:
             return check_queen(board, sx, sy, ex, ey, xdist, ydist);
         case 4:
-            return check_king(ex, ey, xdist, ydist, king);
+            return check_king(xdist, ydist);
         case 5:
             return check_pawn(board, sx, sy, ex, ey, xdist, ydist);
         default:
@@ -240,7 +240,7 @@ int check_queen(int board[8][8][2], int sx, int sy, int ex, int ey, int xdist, i
     return 0;
 }
 
-int check_king(int ex, int ey, int xdist, int ydist, int king[2]) {
+int check_king(int xdist, int ydist) {
     // checks that king is only moving one space away
     if (abs(xdist) < 2 && abs(ydist) < 2) {
         return 1;
