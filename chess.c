@@ -44,23 +44,29 @@ int main(void) { //TODO: implement advanced moves (castling, en passant, queenin
             player = !player;
         }
     }
+    print_board(board, pieces);
+    printf("Checkmate\n");
     return 0;
 }
 
 void print_board(int board[8][8][2], char pieces[2][16][4]) {
     // loops through board and prints pieces to screen along with spaces
     for (int i = 0; i < 8; i++) {
-        printf("+---+---+---+---+---+---+---+---+\n");
+        if (i != 0) {
+		printf("├───┼───┼───┼───┼───┼───┼───┼───┤\n");
+	} else {
+		printf("┌───┬───┬───┬───┬───┬───┬───┬───┐\n");	
+	}
         for (int j = 0; j < 8; j++) {
             if (board[i][j][0] != -1) {
-                printf("| %s ", pieces[board[i][j][0]][board[i][j][1]]);
+                printf("│ %s ", pieces[board[i][j][0]][board[i][j][1]]);
             } else {
-                printf("|   ");
+                printf("│   ");
             }
         }
-        printf("|\n");
+        printf("│\n");
     }
-    printf("+---+---+---+---+---+---+---+---+\n");
+    printf("└───┴───┴───┴───┴───┴───┴───┴───┘\n");
 }
 
 int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int player, int *game) {
@@ -77,7 +83,7 @@ int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int
         }
         // checks for checkmate and stops game if it returns true
         if (checkmate(board, king, player)) {
-            printf("Checkmate\n");
+            system("clear");
             *game = 0;
         }
         return 1;
