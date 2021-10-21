@@ -9,14 +9,14 @@ int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int
 int main(void) { //TODO: implement advanced moves (castling, en passant, queening)
     // game board with pieces and blank spaces
     int board[8][8][2] = {
-            {{1,0},{1,1},{1,2},{1,3},{1,4},{1,2},{1,1},{1,0}},
-            {{1,5},{1,5},{1,5},{1,5},{1,5},{1,5},{1,5},{1,5}},
+            {{ 1, 0},{ 1, 1},{ 1, 2},{ 1, 3},{ 1, 4},{ 1, 2},{ 1, 1},{ 1, 0}},
+            {{ 1, 5},{ 1, 5},{ 1, 5},{ 1, 5},{ 1, 5},{ 1, 5},{ 1, 5},{ 1, 5}},
             {{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1}},
             {{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1}},
             {{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1}},
             {{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1},{-1,-1}},
-            {{0,5},{0,5},{0,5},{0,5},{0,5},{0,5},{0,5},{0,5}},
-            {{0,0},{0,1},{0,2},{0,3},{0,4},{0,2},{0,1},{0,0}}
+            {{ 0, 5},{ 0, 5},{ 0, 5},{ 0, 5},{ 0, 5},{ 0, 5},{ 0, 5},{ 0, 5}},
+            {{ 0, 0},{ 0, 1},{ 0, 2},{ 0, 3},{ 0, 4},{ 0, 2},{ 0, 1},{ 0, 0}}
     };
     int king[2][2] = {
             {7, 4},
@@ -29,6 +29,7 @@ int main(void) { //TODO: implement advanced moves (castling, en passant, queenin
     int player = 0;
     int game = 1;
     // game loop
+
     while(game) {
     	system("clear");
         print_board(board, pieces);
@@ -67,7 +68,7 @@ int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int
         // "checks" for check... get it? check and check... lol
         if (!check(board, sx, sy, ex, ey, king[player])) {
             transfer_piece(board, sx, sy, ex, ey);
-	    if (sx == king[player][1] && sy == king[player][0]) {
+	        if (sx == king[player][1] && sy == king[player][0]) {
                 king[player][0] = ey;
                 king[player][1] = ex;
             }

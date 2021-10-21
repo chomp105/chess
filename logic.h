@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 int checkmate(int board[8][8][2], int king[2][2], int player);
-int check(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]);
+int check(int board[8][8][2], int sx, int sy, int ex, int ey, const int king[2]);
 void transfer_piece(int board[8][8][2], int sx, int sy, int ex, int ey);
 int eval(int board[8][8][2], int sx, int sy, int ex, int ey);
 int check_rook(int board[8][8][2], int sx, int sy, int ex, int ey, int xdist, int ydist);
@@ -11,6 +11,7 @@ int check_bishop(int board[8][8][2], int sx, int sy, int xdist, int ydist);
 int check_queen(int board[8][8][2], int sx, int sy, int ex, int ey, int xdist, int ydist);
 int check_king(int xdist, int ydist);
 int check_pawn(int board[8][8][2], int sx, int sy, int ex, int ey, int xdist, int ydist);
+
 
 int checkmate(int board[8][8][2], int king[2][2], int player) {
     // loops through every spot on the board and for each spot, if it is an enemy of the current player,
@@ -22,7 +23,7 @@ int checkmate(int board[8][8][2], int king[2][2], int player) {
                     for (int l = 0; l < 8; l++) {
                         // if there is a move which is safe, it returns false
                         if (!(check(board, i, j, k, l, king[!player]))) {
-			     return 0;
+			                return 0;
                         }
                     }
                 }
@@ -32,7 +33,7 @@ int checkmate(int board[8][8][2], int king[2][2], int player) {
     return 1;
 }
 
-int check(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]) {
+int check(int board[8][8][2], int sx, int sy, int ex, int ey, const int king[2]) {
     int nboard[8][8][2];
     // copies board to new board to perform check function
     for (int i = 0; i < 8; i++) {
@@ -44,12 +45,12 @@ int check(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2]) {
     if (eval(board, sx, sy, ex, ey) && !((sx == ex) && (sy == ey)) && board[ey][ex][0] != board[sy][sx][0]) {
         // moves piece on the new board and sets kingx and kingy to their correct positions
         transfer_piece(nboard, sx, sy, ex, ey);
-	if (sx == king[1] && sy == king[0]) {
-            king[0] = ey;
-       	    king[1] = ex;
-        }
-        int kingx = king[1];
         int kingy = king[0];
+        int kingx = king[1];
+	    if (sx == king[1] && sy == king[0]) {
+            kingy = ey;
+       	    kingx = ex;
+        }
         // loops through every spot on the board and checks to see if it can attack the king
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
