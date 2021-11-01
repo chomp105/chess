@@ -5,6 +5,7 @@
 
 void print_board(int board[8][8][2], char pieces[2][16][4]);
 int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int player, int *game);
+int valid(int input);
 
 int main(void) { //TODO: implement advanced moves (castling, en passant, queening)
     // game board with pieces and blank spaces
@@ -70,10 +71,20 @@ void print_board(int board[8][8][2], char pieces[2][16][4]) {
 }
 
 int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int player, int *game) {
-    if (eval(board, sx, sy, ex, ey)) {
+    if (eval(board, sx, sy, ex, ey) && valid(ex) && valid(ey)) {
         // "checks" for check... get it? check and check... lol
         if (!check(board, sx, sy, ex, ey, king[player])) {
             transfer_piece(board, sx, sy, ex, ey);
+            if ((ey == 0 || ey == 7) && board[ey][ex][1] == 5) {
+                int choice;
+                system("clear");
+                printf("[0] rook\n[1] knight\n[2] bishop\n[3] queen\nWhich piece would you like to promote to:");
+                scanf("%d", &choice);
+                if (choice > 3 || choice < 0) {
+                    choice = 3;
+                }
+                board[ey][ex][1] = choice;
+            }
 	        if (sx == king[player][1] && sy == king[player][0]) {
                 king[player][0] = ey;
                 king[player][1] = ex;
@@ -89,4 +100,8 @@ int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int
         return 1;
     }
     return 0;
+}
+
+int valid(int input) {
+    return (input < 8 && input >= 0);
 }
