@@ -78,7 +78,7 @@ int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int
             if ((ey == 0 || ey == 7) && board[ey][ex][1] == 5) {
                 int choice;
                 system("clear");
-                printf("[0] rook\n[1] knight\n[2] bishop\n[3] queen\nWhich piece would you like to promote to:");
+                printf("[0] rook\n[1] knight\n[2] bishop\n[3] queen\nWhich piece would you like to promote to: ");
                 scanf("%d", &choice);
                 if (choice > 3 || choice < 0) {
                     choice = 3;
