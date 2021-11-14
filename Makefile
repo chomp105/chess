@@ -1,2 +1,2 @@
 chess:
-	gcc bin/main.c bin/chess.c bin/logic.c -o chess
+	gcc src/main.c src/chess.c src/logic.c -o chess
