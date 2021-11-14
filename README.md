@@ -11,3 +11,9 @@ a starting move of pawn to e4 would look like this:
 ```
 player 1: 5 7 5 5
 ```
+
+installation
+------------
+1. cd into the chess directory
+2. type `make`
+3. type `./chess`
