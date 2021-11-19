@@ -24,7 +24,7 @@ void print_board(int board[8][8][2], char pieces[2][16][4]) {
 }
 
 int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int player, int *game, int enpas[5]) {
-    if (enpas[0] == 1 && board[sy][sx][1] == 5 && ex - sx != 0) {
+    if (enpas[0] == 1 && board[sy][sx][1] == 5 && ex - sx != 0 && sy == enpas[4] && abs(sx - enpas[3]) == 1) {
         transfer_piece(board, enpas[3], enpas[4], enpas[1], enpas[2]);
         enpas[0] = 0;
     }
@@ -64,6 +64,7 @@ int move(int board[8][8][2], int sx, int sy, int ex, int ey, int king[2][2], int
         return 1;
     } else {
         transfer_piece(board, enpas[2], enpas[1], enpas[4], enpas[3]);
+        printf("yessirrrr");
         enpas[0] = 1;
     }
     return 0;
