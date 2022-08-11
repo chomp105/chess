@@ -6,7 +6,7 @@
 void print_board(int board[8][8][2], char pieces[2][16][4]) {
     // loops through board and prints pieces to screen along with spaces
     for (int i = 0; i < 8; i++) {
-        if (i != 0) {
+        if (i) {
             printf("├───┼───┼───┼───┼───┼───┼───┼───┤\n");
         } else {
             printf("┌───┬───┬───┬───┬───┬───┬───┬───┐\n");
